@@ -9,9 +9,9 @@ imports:
 parameters:
     locale: fr
     sites:
-      www.guineenews.org
-
-
+        http://guineenews.org:
+            feed_url: 'http://guineenews.org/feed'
+            feed_format: rss
 framework:
     #esi: ~
     #translator: { fallbacks: ['%locale%'] }
