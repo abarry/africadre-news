@@ -2,7 +2,6 @@ imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
     - { resource: services.yml }
-    - { resource: "@CrawlerBundle/Resources/config/services.yml" }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
@@ -11,7 +10,9 @@ parameters:
     sites:
         http://guineenews.org:
             feed_url: 'http://guineenews.org/feed'
-            feed_format: rss
+        http://www.africaguinee.com:
+            feed_url: 'http://www.africaguinee.com/?q=rss.xml'
+
 framework:
     #esi: ~
     #translator: { fallbacks: ['%locale%'] }
