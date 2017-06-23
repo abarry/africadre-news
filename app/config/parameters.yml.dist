@@ -14,6 +14,12 @@ parameters:
     mailer_host: 127.0.0.1
     mailer_user: ~
     mailer_password: ~
+    es_host: localhost
+    es_port: '9200'
+    es_feed_index: 'africadre-news-feed-1.0.0'
+    es_schema: 'http'
+    es_user: ''
+    es_password: ''
 
     # A secret key that's used to generate certain security-related tokens
     secret: ThisTokenIsNotSoSecretChangeIt

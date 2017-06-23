@@ -2,8 +2,8 @@
 
 namespace CrawlerBundle\Command;
 
-use Elasticsearch\ClientBuilder;
-use GuzzleHttp\Client;
+use PicoFeed\PicoFeedException;
+use PicoFeed\Reader\Reader;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,40 +30,22 @@ class AppCrawlerCrawlCommand extends ContainerAwareCommand
         if (!$sites[$site]) {
             throw new \InvalidArgumentException(sprintf("%s site doesn't exist", $site));
         }
+
         $siteConfig = $sites[$site];
-        $client = new Client();
-        $response = $client->get($siteConfig['feed_url']);
-        $xml = new \SimpleXMLElement($response->getBody()->getContents());
 
-        $esHost = $this->getContainer()->getParameter('es_host');
-        $esPort = $this->getContainer()->getParameter('es_port');
-        /**
-         * @var \Elasticsearch\Client
-         */
-        $esClient = ClientBuilder::create()
-            ->setHosts([
-                'host' => $esHost,
-                'port' => $esPort,
-            ])
-            ->build();
+        try {
+            $reader = new Reader;
+            $resource = $reader->download($siteConfig['feed_url']);
+            $parser = $reader->getParser(
+                $resource->getUrl(),
+                $resource->getContent(),
+                $resource->getEncoding()
+            );
 
-        $esClient->indices()->create(['index'=>'africadre-news']);
-
-        $article = $xml->channel->item;
-        $esClient->create(
-            [
-                'index' => 'africadre-news',
-                'type'  => 'article',
-                'id'    => md5($article->link),
-                'body'  => [
-                    'title' => $article->title,
-                    'link'  => $article->link,
-                    'comments'  => $article->comments,
-                    'category'  => $article->category,
-                    'description'   => $article->description
-                ]
-            ]
-        );
+            $feed = $parser->execute();
+            $this->getContainer()->get('ElasticsearchFeedRepository')->bulkUpsert($feed);
+        }
+        catch (PicoFeedException $e) {
+        }
     }
-
 }
