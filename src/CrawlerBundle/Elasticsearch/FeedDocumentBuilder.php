@@ -18,6 +18,11 @@ class FeedDocumentBuilder
     public static function build(Feed $feed, Item $item) : array
     {
         return [
+            'id'    => $feed->getId(),
+            'title' => $feed->getTitle(),
+            'description' => $feed->getDescription(),
+            'language'  => $feed->getLanguage(),
+            'site'  => $feed->getSiteUrl(),
             'items' => [
                 'id'            => $item->getId(),
                 'title'         => $item->getTitle(),
